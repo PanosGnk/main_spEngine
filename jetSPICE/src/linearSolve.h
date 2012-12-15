@@ -300,4 +300,26 @@ void invVec (double *x, int size);
  */
 void mvProd (double *Ax, double **A, double *x, int size, int method);
 
+
+/**
+ * Function that prints vector.
+ *
+ * @param x vector.
+ * @param size size of vector.
+ */
+void printVec(double *x, int size);
+
+
+/**
+ * Function that add two Matrices.
+ * @param M result matrix.
+ * @param alpha multiplicant of A.
+ * @param A matrix A
+ * @param beta multiplicant of A
+ * @param B matirx B.
+ * @param size size of the system.
+ *
+ */
+void addMMScal(double *M, double alpha, double *A, double beta, double *B, int size);
+
 #endif /* LINEARSOLVE_H_ */

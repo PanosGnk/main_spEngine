@@ -28,12 +28,12 @@ traceFileList *initializeTraceFiles ();
 void initializeFiles ( traceFileList *flist );
 int *findVarPositions ( char **vec, int size );
 int *findPositions ( hashTable *namTab );
-int checkDCPos (  hashTable *namTab, mnaSystem *sys );
-int checkDCPosSp (  hashTable *namTab, mnaSpSystem *sys );
+int checkDCPos (  zeroCircuit *circuit );
+int checkDCPosSp (  zeroCircuit *circuit );
 
 void dcPointSim ( mnaSystem *sys );
-void dcSweepSim ( mnaSystem *sys, traceFileList *flist, hashTable *names );
+void dcSweepSim ( mnaSystem *sys, traceFileList *flist, hashTable *names, zeroCircuit *cir );
 void dcPointSimSparse ( mnaSpSystem *sys );
-void dcSweepSimSparse ( mnaSpSystem *sys, traceFileList *flist, hashTable *names );
+void dcSweepSimSparce ( mnaSystem *sys, traceFileList *flist, hashTable *names, zeroCircuit *cir );
 
 #endif /* SIM_H_ */

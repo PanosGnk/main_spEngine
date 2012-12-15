@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "types.h"
 #include "mna.h"
+#include "linearSolve.h"
 #include "mnaSparse.h"
 
 
@@ -22,6 +23,7 @@ void initializeCommandList ()
 	cmdList->_method = NODEF;
 	cmdList->_itolValue = 1.0e-3;	//default itol value (maybe a routine to change default values could be good)
 
+	cmdList->_transient = 0;
 	cmdList->_tranFinTime = 0.0;
 	cmdList->_tranTimeStep = 0.0;
 
@@ -225,32 +227,42 @@ int *findPositions ( hashTable *namTab )
 }
 
 
-int checkDCPos (  hashTable *namTab, mnaSystem *sys )
+int checkDCPos (  zeroCircuit *circuit )
 {
 	int pos;
+	zeroCircuit *cur;
 
-		pos = findVarPos ( cmdList->_dcId[0], sys->vector_X, sys->dim );
-		if ( pos == -1 )
+	for( cur = circuit->next; ( (cur->linElement != NULL) || (cur->nonlinElement != NULL) ); cur = cur->next )
+	{
+		if ( !strcmp ( cur->linElement->id, cmdList->_dcId[0] ) )
 		{
-			printf ( "ERROR : Specified node '%s' does not exist\n", cmdList->_dcId[0] );
-			exit  (-1);
+			pos = cur->linElement->k;
+			return pos;
 		}
-		//printf ("_________>%d\n",positions[i]);
-	return ( pos );
+		
+	}
+	
+	printf ( "ERROR : Specified node '%s' does not exist\n", cmdList->_dcId[0] );
+	exit  (-1);
 }
 
-int checkDCPosSp (  hashTable *namTab, mnaSpSystem *sys )
+int checkDCPosSp ( zeroCircuit *circuit )
 {
 	int pos;
+	zeroCircuit *cur;
 
-		pos = findVarPos ( cmdList->_dcId[0], sys->vector_X, sys->dim );
-		if ( pos == -1 )
+	for( cur = circuit->next; ( (cur->linElement != NULL) || (cur->nonlinElement != NULL) ); cur = cur->next )
+	{
+		if ( !strcmp ( cur->linElement->id, cmdList->_dcId[0] ) )
 		{
-			printf ( "ERROR : Specified node '%s' does not exist\n", cmdList->_dcId[0] );
-			exit  (-1);
+			pos = cur->linElement->k;
+			return pos;
 		}
-		//printf ("_________>%d\n",positions[i]);
-	return ( pos );
+		
+	}
+	
+	printf ( "ERROR : Specified node '%s' does not exist\n", cmdList->_dcId[0] );
+	exit  (-1);
 }
 
 
@@ -312,6 +324,7 @@ void dcPointSim ( mnaSystem *sys )
 		break;
 	}
 
+	sys->dcPointRes = result;
 		printf("\n\n");
 
 		printf ("\t--- Solution ---\n");
@@ -338,7 +351,7 @@ void dcPointSim ( mnaSystem *sys )
 
 
 
-void dcSweepSim ( mnaSystem *sys, traceFileList *flist, hashTable *names )
+void dcSweepSim ( mnaSystem *sys, traceFileList *flist, hashTable *names, zeroCircuit *cir )
 {
 
 	//int nofSims;
@@ -367,7 +380,7 @@ void dcSweepSim ( mnaSystem *sys, traceFileList *flist, hashTable *names )
 		newPiv = luDecomp ( sys->rowVector, sys->dim, pivotTab );
 
 		positions = findPositions ( names );
-		pos = checkDCPos ( names, sys );
+		pos = checkDCPos ( cir );
 
 		for ( i = cmdList->_dcValues[0]; i <= cmdList->_dcValues[1]; i += cmdList->_dcValues[2] )
 		{
@@ -392,7 +405,7 @@ void dcSweepSim ( mnaSystem *sys, traceFileList *flist, hashTable *names )
 
 		//printf ("In SPD case....\n\n");
 		positions = findPositions ( names );
-		pos = checkDCPos ( names, sys );
+		pos = checkDCPos ( cir );
 
 		pVec = ( double * )malloc ( sys->dim * sizeof( double ) );
 		choleskyDecomp ( sys->rowVector, sys->dim, pVec );
@@ -423,7 +436,7 @@ void dcSweepSim ( mnaSystem *sys, traceFileList *flist, hashTable *names )
 
 			//printf ("In ITER case....\n\n");
 			positions = findPositions ( names );
-			pos = checkDCPos ( names, sys );
+			pos = checkDCPos ( cir );
 
 	        printf( "\n\n" );
 
@@ -453,7 +466,7 @@ void dcSweepSim ( mnaSystem *sys, traceFileList *flist, hashTable *names )
 	case ITERSPD:
 
 			positions = findPositions ( names );
-			pos = checkDCPos ( names, sys );
+			pos = checkDCPos ( cir );
 
 	         //printf ("In ITERSPD case....\n\n");
 	         printf( "\n\n" );
@@ -515,12 +528,13 @@ void dcPointSimSparse ( mnaSpSystem *sys )
 	{
 	case SPD:
 		printf("\tINFO : Used Cholesky Factorization\n");
-		status = cs_cholsol(1, sys->array_A, sys->vector_B);
+		vecCpy(result, sys->vector_B, sys->dim);
+		status = cs_cholsol(1, sys->array_A, result);
 		break;
 
 	case DEFAULT:
 		printf("\tINFO : Used LU Factorization\n");
-        vecCpy(result, sys->vector_B, sys->dim);
+                vecCpy(result, sys->vector_B, sys->dim);
 		status = cs_lusol(2, sys->array_A, result, 1.0);
 		break;
 
@@ -556,7 +570,7 @@ void dcPointSimSparse ( mnaSpSystem *sys )
 
 
 
-void dcSweepSimSparse ( mnaSpSystem *sys, traceFileList *flist, hashTable *names )
+void dcSweepSimSparse ( mnaSpSystem *sys, traceFileList *flist, hashTable *names, zeroCircuit *cir )
 {
 
 	//int nofSims;
@@ -572,31 +586,31 @@ void dcSweepSimSparse ( mnaSpSystem *sys, traceFileList *flist, hashTable *names
 
 	int *positions;
 
-	int iters;
+	int iters, state;
 
 	iters = 0;
+        if( !( result = (double *)calloc(sys->dim, sizeof(double)) ) )
+        {
+            printf("ERROR : Memory full ( allocate failure )\n");
+            exit(-1);
+        }
 
 	switch ( cmdList->_options )
 	{
 	case DEFAULT:
 
-
-		//printf ("In DEFAULT case....\n\n");
-		pivotTab = ( int * )calloc( sys->dim , sizeof ( int ) );
-		newPiv = luDecomp ( sys->rowVector, sys->dim, pivotTab );
-
 		//BUGFIX : The X vector indicating the system variables is not transversed
 		positions = findPositions ( names );
-		pos = checkDCPosSp ( names, sys );
+		pos = checkDCPosSp ( cir );
 
 		printf( "\n\n" );
 
 		for ( i = cmdList->_dcValues[0]; i <= cmdList->_dcValues[1]; i += cmdList->_dcValues[2] )
 		{
+		        vecCpy(result, sys->vector_B, sys->dim);
+			result[pos] = i;
 
-			sys->vector_B[pos] = i;
-
- 			result = luBackSubst( newPiv, sys->dim, pivotTab, sys->vector_B);
+ 			state = cs_lusol(2, sys->array_A, result, 1.0);
 
  			if ( cmdList->_plotnum )
  			{
@@ -627,18 +641,15 @@ void dcSweepSimSparse ( mnaSpSystem *sys, traceFileList *flist, hashTable *names
 
 		//printf ("In SPD case....\n\n");
 		positions = findPositions ( names );
-		pos = checkDCPosSp ( names, sys );
-
-		pVec = ( double * )malloc ( sys->dim * sizeof( double ) );
-		choleskyDecomp ( sys->rowVector, sys->dim, pVec );
-
+		pos = checkDCPosSp ( cir );
 
 		for ( i = cmdList->_dcValues[0]; i <= cmdList->_dcValues[1]; i += cmdList->_dcValues[2] )
 		{
 
-			sys->vector_B[pos] = i;
+		        vecCpy(result, sys->vector_B, sys->dim);
+			result[pos] = i;
 
-			result = choleskySolve ( sys->rowVector, sys->dim, pVec, sys->vector_B );
+			state =  cs_cholsol(1, sys->array_A, result);
 
 
 			if ( cmdList->_plotnum )
@@ -661,16 +672,17 @@ void dcSweepSimSparse ( mnaSpSystem *sys, traceFileList *flist, hashTable *names
 
 			//printf ("In ITER case....\n\n");
 			positions = findPositions ( names );
-			pos = checkDCPosSp ( names, sys );
+			pos = checkDCPosSp ( cir );
 
 	        printf( "\n\n" );
 
 	        for ( i = cmdList->_dcValues[0]; i <= cmdList->_dcValues[1]; i += cmdList->_dcValues[2] )
 	        {
 
-	            sys->vector_B[pos] = i;
+	            vecCpy(result, sys->vector_B, sys->dim);
+	            result[pos] = i;
 
-	            result = cs_bicg (sys->array_A ,sys->vector_B ,sys->dim ,&iters ,cmdList->_itolValue );
+	            result = cs_bicg (sys->array_A ,result ,sys->dim ,&iters ,cmdList->_itolValue );
 
 	            if ( cmdList->_plotnum )
 	                  {
@@ -691,15 +703,16 @@ void dcSweepSimSparse ( mnaSpSystem *sys, traceFileList *flist, hashTable *names
 
 	         //printf ("In ITERSPD case....\n\n");
 			positions = findPositions ( names );
-			pos = checkDCPosSp ( names, sys );
+			pos = checkDCPosSp ( cir );
 	         printf( "\n\n" );
 
 	         for ( i = cmdList->_dcValues[0]; i <= cmdList->_dcValues[1]; i += cmdList->_dcValues[2] )
 	         {
 
-	               sys->vector_B[pos] = i;
+	             vecCpy(result, sys->vector_B, sys->dim);
+	             result[pos] = i;
 
-	               result = cs_cg (sys->array_A ,sys->vector_B ,sys->dim ,&iters ,cmdList->_itolValue );
+	               result = cs_cg (sys->array_A ,result ,sys->dim ,&iters ,cmdList->_itolValue );
 
 	               printf("CG DONE...\n");
 

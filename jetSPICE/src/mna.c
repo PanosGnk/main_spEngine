@@ -17,99 +17,99 @@ extern int lnumber;
 extern int rnumber;
 extern int inumber;
 
-
+extern commandList *cmdList;
 
 nodeTable initializeTable ()
 {
-	nodeTable nodes;
+  nodeTable nodes;
 
-	nodes.size = 0;
-	nodes.table = NULL;
+  nodes.size = 0;
+  nodes.table = NULL;
 
-	return nodes;
+  return nodes;
 }
 
 
 
 /*
-int findPlace(int connector,nodeTable *table )
-{
-	int i;
+   int findPlace(int connector,nodeTable *table )
+   {
+   int i;
 
-	for (i=0; i<table->size; i++) {
+   for (i=0; i<table->size; i++) {
 
-		if(table->table[i]==connector) {
-			return i;
-		}
+   if(table->table[i]==connector) {
+   return i;
+   }
 
-	}
-	return -1;
-}
-*/
+   }
+   return -1;
+   }
+ */
 
 
 
 /*
-nodeTable  analyseNodes( zeroCircuit *node, nodeTable nodes )
-{
-	int *cur;
-	int iter;
-	int found1, found2, found3;
+   nodeTable  analyseNodes( zeroCircuit *node, nodeTable nodes )
+   {
+   int *cur;
+   int iter;
+   int found1, found2, found3;
 
 
-	found1 = 0;
-	found2 = 0;
-	found3 = 0;
+   found1 = 0;
+   found2 = 0;
+   found3 = 0;
 
 
-	switch ( node->type )
-	{
-	case 0:
+   switch ( node->type )
+   {
+   case 0:
 
-		for ( cur = nodes.table , iter = 0; iter < nodes.size; ++iter, ++cur )
-		{
-			if ( *cur == node->linElement->connectors[0] )
-			{
-				found1 = 1;
-			}
-			if ( *cur == node->linElement->connectors[1] )
-			{
-				found2 = 1;
-			}
+   for ( cur = nodes.table , iter = 0; iter < nodes.size; ++iter, ++cur )
+   {
+   if ( *cur == node->linElement->connectors[0] )
+   {
+   found1 = 1;
+   }
+   if ( *cur == node->linElement->connectors[1] )
+   {
+   found2 = 1;
+   }
 
-		}
+   }
 
-		if ( !found1 )
-		{
-			if ( node->linElement->connectors[0] != 0 )
-			{
-				nodes.table = realloc( nodes.table, ( nodes.size + 1 )*sizeof( int ) );
-				nodes.size++;
+   if ( !found1 )
+   {
+   if ( node->linElement->connectors[0] != 0 )
+   {
+   nodes.table = realloc( nodes.table, ( nodes.size + 1 )*sizeof( int ) );
+   nodes.size++;
 
-				nodes.table [nodes.size-1] = node->linElement->connectors[0];
-			}
-		}
+   nodes.table [nodes.size-1] = node->linElement->connectors[0];
+   }
+   }
 
-		if ( !found2 )
-		{
-			if ( node->linElement->connectors[1] != 0 )
-			{
-				nodes.table = realloc( nodes.table, ( nodes.size + 1 )*sizeof( int ) );
-				nodes.size++;
+   if ( !found2 )
+   {
+   if ( node->linElement->connectors[1] != 0 )
+   {
+   nodes.table = realloc( nodes.table, ( nodes.size + 1 )*sizeof( int ) );
+   nodes.size++;
 
-				nodes.table [ nodes.size-1 ] = node->linElement->connectors[1];
-			}
-		}
+   nodes.table [ nodes.size-1 ] = node->linElement->connectors[1];
+   }
+   }
 
-		break;
-	case 1:
+   break;
+   case 1:
 
-		// Code for non-linear elements handling
+// Code for non-linear elements handling
 
-		break;
-	}
+break;
+}
 
-	return nodes;
+return nodes;
 
 }
 
@@ -117,15 +117,15 @@ nodeTable  analyseNodes( zeroCircuit *node, nodeTable nodes )
 
 void printNodes( nodeTable nodes )
 {
-	int i;
+int i;
 
-	printf( "LookUp table of nodes:\n\t-" );
+printf( "LookUp table of nodes:\n\t-" );
 
-	for ( i=0; i< nodes.size; i++)
-	{
-		printf( "%d ", nodes.table[i] );
-	}
-	printf( "\n" );
+for ( i=0; i< nodes.size; i++)
+{
+  printf( "%d ", nodes.table[i] );
+}
+printf( "\n" );
 
 }
 */
@@ -133,194 +133,257 @@ void printNodes( nodeTable nodes )
 
 /*
  *  R = 1,
-	V = 2,
-	I = 3,
-	C = 4,
-	L = 5,
-	D = 6,
-	M = 7,
-	Q = 8
+ V = 2,
+ I = 3,
+ C = 4,
+ L = 5,
+ D = 6,
+ M = 7,
+ Q = 8
  */
 
 
-#define STRSIZE 32
+// #define STRSIZE 32
 
 
-void initVectorX ( zeroCircuit *node, mnaSystem *system, hashTable *table  )
+void initVectorX ( mnaSystem *system, hashTable *table  )
 {
-	char *str;
-	int i;
+  //char *str;
+  int i;
 
-	for ( i=0; i<table->currPos; i++ )
-	{
-		str = NULL;
-		str = (char *)malloc( STRSIZE * sizeof( char ) );
+  for ( i=0; i<table->currPos; i++ )
+  {
+    //str = NULL;
+    //str = (char *)malloc( STRSIZE * sizeof( char ) );
 
-		sprintf(str, "V(node %d)", findHash ( table, node->linElement->id ) );
+    //sprintf(str, "V(node %d)", findHas () );
 
-		system->vector_X[i] = str;
-	}
+    //system->vector_X[i] = str;
+  }
 }
 
 
 
 void fillVectorX ( zeroCircuit *node, mnaSystem *system, int k, int origsize )
 {
-	char *str;
+  char *str;
 
-	str = (char *)malloc( STRSIZE * sizeof( char ) );
+  str = (char *)malloc( STRSIZE * sizeof( char ) );
 
-	sprintf( str, "I(%s)", node->linElement->id );
+  sprintf( str, "I(%s)", node->linElement->id );
 
-	system->vector_X[ origsize + k -1 ] = str;
+  system->vector_X[ origsize + k -1 ] = str;
 }
 
 
 
 void addElementStamp( zeroCircuit *node, mnaSystem *system, hashTable *namTab, int row, int kPos )
 {
-	int posn1;
-	int posn2;
+  int posn1;
+  int posn2;
 
-	struct linear_element *element;
+  struct linear_element *element;
 
-	element = node->linElement;
-
-
-	switch ( node->type )
-	{
-	case 0:
-		switch( node->linElement->element )
-		{
-		case 1:
-
-			if ( ( strcmp( node->linElement->connectors[0], "0\0" ) ) && ( strcmp( node->linElement->connectors[1], "0\0" ) ) )
-			{
-				//code for simple integer mapping
-				//posn1 = findPlace ( node->linElement->connectors[0], &nodes );
-				//posn2 = findPlace ( node->linElement->connectors[1], &nodes );
-
-				//code for hashtable string mapping
-				posn1 = findHash ( namTab, node->linElement->connectors[0] );
-				//printf ( "----> %d", posn1 );
-				posn2 = findHash ( namTab, node->linElement->connectors[1] );
-				//printf ( "----> %d", posn2 );
-
-				system->array_A[ row * posn1 + posn2 ] += (-1.0) * ( 1.0 / node->linElement->value);
-				system->array_A[ row * posn2 + posn1 ] += (-1.0) * ( 1.0 / node->linElement->value);
+  element = node->linElement;
 
 
-			}
+  switch ( node->type )
+  {
+    case 0:
+      switch( node->linElement->element )
+      {
+        case 1:
 
-			if ( strcmp( node->linElement->connectors[0], "0\0" ) )
-			{
-				//posn1 = findPlace ( node->linElement->connectors[0], &nodes );
-				posn1 = findHash ( namTab, node->linElement->connectors[0] );
-				system->array_A[ row * posn1 + posn1 ] += ( 1.0 / node->linElement->value );
-			}
+          if ( ( strcmp( node->linElement->connectors[0], "0" ) ) && ( strcmp( node->linElement->connectors[1], "0" ) ) )
+          {
+            //code for simple integer mapping
+            //posn1 = findPlace ( node->linElement->connectors[0], &nodes );
+            //posn2 = findPlace ( node->linElement->connectors[1], &nodes );
 
-			if ( strcmp( node->linElement->connectors[1], "0\0" ) )
-			{
-				//posn2 = findPlace ( node->linElement->connectors[1], &nodes );
-				posn2 = findHash ( namTab, node->linElement->connectors[1] );
-				system->array_A[ row * posn2 + posn2 ] += ( 1.0 / node->linElement->value );
+            //code for hashtable string mapping
+            posn1 = findHash ( namTab, node->linElement->connectors[0] );
+            //printf ( "----> %d", posn1 );
+            posn2 = findHash ( namTab, node->linElement->connectors[1] );
+            //printf ( "----> %d", posn2 );
 
-				//printf( "bug! %f\n", system->array_A[ row * posn2 + posn2 ]);
-			}
-
-			break;
-		case 3:
-
-
-
-			if ( strcmp( node->linElement->connectors[0], "0\0" ) )
-			{
-				//posn1 = findPlace ( node->linElement->connectors[0], &nodes );
-				posn1 = findHash ( namTab, node->linElement->connectors[0] );
-				system->vector_B[posn1] += (-1.0) * element->value;
-			}
-
-			if ( strcmp( node->linElement->connectors[1], "0\0" ) )
-			{
-				//posn2 = findPlace ( node->linElement->connectors[1], &nodes );
-				posn2 = findHash ( namTab, node->linElement->connectors[1] );
-				system->vector_B[posn2] += element->value;
-			}
-
-			break;
-		case 2: //case 2same as 5
-		case 5:
-
-			if (element->element == 2)
-			{
-				system->vector_B[ namTab->currPos -1 + kPos ] += element->value;
-			}
+            system->array_A[ row * posn1 + posn2 ] += (-1.0) * ( 1.0 / node->linElement->value);
+            system->array_A[ row * posn2 + posn1 ] += (-1.0) * ( 1.0 / node->linElement->value);
 
 
-			if ( ( strcmp( node->linElement->connectors[0], "0\0" ) ) && ( strcmp( node->linElement->connectors[1], "0\0" ) ) )  // implement with strcmp()
-			{
-				//posn1 = findPlace ( element->connectors[0], &nodes );
-				//posn2 = findPlace ( element->connectors[1], &nodes );
+          }
 
-				posn1 = findHash ( namTab, element->connectors[0] );
-				posn2 = findHash ( namTab, element->connectors[1] );
+          if ( strcmp( node->linElement->connectors[0], "0\0" ) )
+          {
+            //posn1 = findPlace ( node->linElement->connectors[0], &nodes );
+            posn1 = findHash ( namTab, node->linElement->connectors[0] );
+            system->array_A[ row * posn1 + posn1 ] += ( 1.0 / node->linElement->value );
+          }
 
-				system->array_A[ row * (kPos + namTab->currPos -1 ) + posn1 ] +=  1.0;
-				system->array_A[ row * (kPos + namTab->currPos -1 ) + posn2 ] += -1.0;
+          if ( strcmp( node->linElement->connectors[1], "0\0" ) )
+          {
+            //posn2 = findPlace ( node->linElement->connectors[1], &nodes );
+            posn2 = findHash ( namTab, node->linElement->connectors[1] );
+            system->array_A[ row * posn2 + posn2 ] += ( 1.0 / node->linElement->value );
 
-				system->array_A[ row * posn1 + kPos + namTab->currPos - 1 ] +=  1.0;
-				system->array_A[ row * posn2 + kPos + namTab->currPos - 1 ] += -1.0;
+            //printf( "bug! %f\n", system->array_A[ row * posn2 + posn2 ]);
+          }
 
-				break;
-			}
-
-			if ( strcmp( node->linElement->connectors[0], "0\0" ) )
-			{
-				//posn2 = findPlace ( element->connectors[1], &nodes );
-				posn2 = findHash ( namTab, element->connectors[1] );
-
-				system->array_A[ row * (kPos + namTab->currPos - 1 ) + posn2 ] += -1.0;
-				system->array_A[ row * posn2 + kPos + namTab->currPos - 1 ] += -1.0;
-
-				break;
-			}
-
-			if ( strcmp( node->linElement->connectors[1], "0\0" ) )
-			{
-				//posn1 = findPlace ( element->connectors[0], &nodes );
-				posn1 = findHash ( namTab, element->connectors[0] );
-
-				system->array_A[ row * (kPos + namTab->currPos - 1 ) + posn1  ] +=  1.0;
-				system->array_A[ row * posn1 + kPos + namTab->currPos - 1 ] +=  1.0;
-
-			}
-
-			break;
-
-
-		}
+          break;
+        case 3:
 
 
 
-		break;
-	case 1:
-		//irrelevant
-		break;
-	}
+          if ( strcmp( node->linElement->connectors[0], "0\0" ) )
+          {
+            //posn1 = findPlace ( node->linElement->connectors[0], &nodes );
+            posn1 = findHash ( namTab, node->linElement->connectors[0] );
+            system->vector_B[posn1] += (-1.0) * element->value;
+          }
+
+          if ( strcmp( node->linElement->connectors[1], "0\0" ) )
+          {
+            //posn2 = findPlace ( node->linElement->connectors[1], &nodes );
+            posn2 = findHash ( namTab, node->linElement->connectors[1] );
+            system->vector_B[posn2] += element->value;
+          }
+
+          break;
+        case 2: //case 2same as 5
+        case 5:
+
+          element->k = kPos;
+          if (element->element == 2)
+          {
+            system->vector_B[ namTab->currPos -1 + kPos ] += element->value;
+          }
+
+
+          if ( ( strcmp( node->linElement->connectors[0], "0\0" ) ) && ( strcmp( node->linElement->connectors[1], "0\0" ) ) )  // implement with strcmp()
+          {
+            //posn1 = findPlace ( element->connectors[0], &nodes );
+            //posn2 = findPlace ( element->connectors[1], &nodes );
+
+            posn1 = findHash ( namTab, element->connectors[0] );
+            posn2 = findHash ( namTab, element->connectors[1] );
+
+            system->array_A[ row * (kPos + namTab->currPos -1 ) + posn1 ] +=  1.0;
+            system->array_A[ row * (kPos + namTab->currPos -1 ) + posn2 ] += -1.0;
+
+            system->array_A[ row * posn1 + kPos + namTab->currPos - 1 ] +=  1.0;
+            system->array_A[ row * posn2 + kPos + namTab->currPos - 1 ] += -1.0;
+
+            break;
+          }
+
+          if ( strcmp( node->linElement->connectors[0], "0\0" ) )
+          {            //posn2 = findPlace ( element->connectors[1], &nodes );
+            posn2 = findHash ( namTab, element->connectors[0] );
+
+            system->array_A[ row * (kPos + namTab->currPos - 1 ) + posn2 ] += 1.0;
+            system->array_A[ row * posn2 + kPos + namTab->currPos - 1 ] += 1.0;
+
+            break;
+          }
+
+          if ( strcmp( node->linElement->connectors[1], "0\0" ) )
+          {
+            //posn1 = findPlace ( element->connectors[0], &nodes );
+            posn1 = findHash ( namTab, element->connectors[1] );
+
+            system->array_A[ row * (kPos + namTab->currPos - 1 ) + posn1  ] +=  -1.0;
+            system->array_A[ row * posn1 + kPos + namTab->currPos - 1 ] +=  -1.0;
+
+          }
+
+          break;
+
+
+      }
+
+
+
+      break;
+    case 1:
+      //irrelevant
+      break;
+  }
+
+}
+
+void buildC ( zeroCircuit *node, mnaSystem *system, hashTable *namTab, int row, int kPos )
+{
+  int posn1;
+  int posn2;
+  double tmp;
+
+  struct linear_element *element;
+
+  element = node->linElement;
+
+
+  switch ( node->type )
+  {
+    case 0:
+      switch( node->linElement->element )
+      {
+        case 4:
+          if ( ( strcmp( node->linElement->connectors[0], "0\0" ) ) && ( strcmp( node->linElement->connectors[1], "0\0" ) ) )
+          {
+            //posn1 = findPlace ( node->linElement->connectors[0], &nodes );
+            //posn2 = findPlace ( node->linElement->connectors[1], &nodes );
+
+            posn1 = findHash ( namTab, node->linElement->connectors[0] );
+            posn2 = findHash ( namTab, node->linElement->connectors[1] );
+
+            tmp = (-1.0) * node->linElement->value;
+            system->array_C[ row * posn1 + posn2  ] += tmp;
+            system->array_C[ row * posn2 + posn1  ] += tmp;
+
+          }
+
+          if ( strcmp( node->linElement->connectors[0], "0\0" ) )
+          {
+            //posn1 = findPlace ( node->linElement->connectors[0], &nodes );
+            posn1 = findHash ( namTab, node->linElement->connectors[0] );
+            tmp = node->linElement->value;
+            system->array_C[ row * posn1 + posn1  ] += tmp;
+          }
+
+          if ( strcmp( node->linElement->connectors[1], "0\0" ) )
+          {
+            //posn2 = findPlace ( node->linElement->connectors[1], &nodes );
+            posn2 = findHash ( namTab, node->linElement->connectors[1] );
+            tmp = node->linElement->value;
+            system->array_C[ row * posn2 + posn2  ] += tmp;
+          }
+
+          break;
+
+        case 5:
+
+          tmp = -node->linElement->value;
+          system->array_C[ row * (kPos + namTab->currPos - 1) + (kPos + namTab->currPos - 1)  ] += tmp;
+          break;
+      }
+      break;
+
+    case 1:
+      //irrelevant
+      break;
+  }
 
 }
 
 
-
-
 void formatRowVec ( mnaSystem *finalSystem )
 {
-	int i;
+  int i;
 
-	for ( i = 0; i < finalSystem->dim; i++ )
-	{
-		finalSystem->rowVector[i] = &finalSystem->array_A[ i*finalSystem->dim ];
-	}
+  for ( i = 0; i < finalSystem->dim; i++ )
+  {
+    finalSystem->rowVector[i] = &finalSystem->array_A[ i*finalSystem->dim ];
+    finalSystem->rowVectorC[i] = &finalSystem->array_C[i*finalSystem->dim ];
+  }
 }
 
 
@@ -328,104 +391,128 @@ void formatRowVec ( mnaSystem *finalSystem )
 
 mnaSystem *formatMnaTable ( zeroCircuit *circuit, hashTable *nameTab, int v_num, int l_num )
 {
-	int rows;
-    int k_pos;
+  int rows;
+  int k_pos;
 
-    zeroCircuit *cur;
-    mnaSystem *finalSystem;
+  zeroCircuit *cur;
+  mnaSystem *finalSystem;
 
-    //initialize k position
-    k_pos = 0;
+  //initialize k position
+  k_pos = 0;
 
-    finalSystem = ( mnaSystem * )malloc ( sizeof( mnaSystem ) );
+  finalSystem = ( mnaSystem * )malloc ( sizeof( mnaSystem ) );
 
-    rows = ( nameTab->currPos ) + v_num + l_num ;
+  rows = ( nameTab->currPos ) + v_num + l_num ;
 
-    finalSystem->array_A = (double *)calloc(rows * rows, sizeof(double));  //cols = rows
-    finalSystem->vector_B = (double *)calloc(rows, sizeof(double));
-    finalSystem->vector_X = (char **)malloc( rows * sizeof (char *) );
+  printf("Megethos: %d\n", rows);
 
-    finalSystem->rowVector = (double **)calloc(rows, sizeof(double *));
+  finalSystem->array_A = (double *)calloc(rows * rows, sizeof(double));  //cols = rows
+  finalSystem->array_C = (double *)calloc(rows * rows, sizeof(double));
+  finalSystem->vector_B = (double *)calloc(rows, sizeof(double));
+  finalSystem->vector_X = (char **)malloc( rows * sizeof (char *) );
 
-    finalSystem->dim = rows;
+  finalSystem->rowVector = (double **)calloc(rows, sizeof(double *));
+  finalSystem->rowVectorC = (double **)calloc(rows, sizeof(double *));
 
-    initVectorX ( circuit->next, finalSystem, nameTab );
+  finalSystem->dim = rows;
 
-    //for ( cur = circuit->next; (cur->linElement == NULL && cur->nonlinElement == NULL); cur = cur->next )
-    for( cur = circuit->next; ( (cur->linElement != NULL) || (cur->nonlinElement != NULL) ); cur = cur->next )
+  // initVectorX ( finalSystem, nameTab );
+
+  //for ( cur = circuit->next; (cur->linElement == NULL && cur->nonlinElement == NULL); cur = cur->next )
+  for( cur = circuit->next; ( (cur->linElement != NULL) || (cur->nonlinElement != NULL) ); cur = cur->next )
+  {
+    if (( cur->linElement->element == 2 ) || ( cur->linElement->element == 5 ))  //if element is voltage source or inductor
     {
-    	if (( cur->linElement->element == 2 ) || ( cur->linElement->element == 5 ))  //if element is voltage source or inductor
-    	{
-    		k_pos++;
-    		fillVectorX ( cur, finalSystem, k_pos, nameTab->currPos );
-    	}
-
-    	addElementStamp ( cur, finalSystem, nameTab, rows, k_pos );
-
+      k_pos++;
+      fillVectorX ( cur, finalSystem, k_pos, nameTab->currPos );
     }
 
-    formatRowVec ( finalSystem );
+    addElementStamp ( cur, finalSystem, nameTab, rows, k_pos );
 
-    return ( finalSystem );
+    //Transient Analysis : Build C
+    if (cmdList->_transient == 1)
+    {
+      buildC( cur, finalSystem, nameTab, rows, k_pos);
+    }
+
+  }
+
+  formatRowVec ( finalSystem );
+
+  return ( finalSystem );
 }
 
 
 
 void printMNA (hashTable *names, mnaSystem *systemMna )
 {
-	int i,j;
+  int i,j;
 
-	printf( "\tINFO : Group 2 elements:\n\t\t-Voltage Sources: %d\n\t\t-Inductors: %d\n", vnumber, lnumber );
-	printf( "\tINFO : Group 1 elements:\n\t\t-Resistors: %d\n\t\t-Current Sources: %d\n", rnumber, inumber );
-	printf( "\tINFO : Number of nodes of sub-Matrix G: %d\n", names->currPos );
-
-
-
-	FILE *bfile;
-
-	bfile = fopen ( "mna_system.txt", "w" );
+  printf( "\tINFO : Group 2 elements:\n\t\t-Voltage Sources: %d\n\t\t-Inductors: %d\n", vnumber, lnumber );
+  printf( "\tINFO : Group 1 elements:\n\t\t-Resistors: %d\n\t\t-Current Sources: %d\n", rnumber, inumber );
+  printf( "\tINFO : Number of nodes of sub-Matrix G: %d\n", names->currPos );
 
 
-	fprintf( bfile, "\tINFO : Group 2 elements:\n\t\t-Voltage Sources: %d\n\t\t-Inductors: %d\n", vnumber, lnumber );
-	fprintf( bfile, "\tINFO : Group 1 elements:\n\t\t-Resistors: %d\n\t\t-Current Sources: %d\n", rnumber, inumber );
-	fprintf( bfile, "\tINFO : Number of nodes of sub-Matrix G: %d\n", names->currPos );
-	fprintf( bfile, "\n\n\n\n" );
-	fprintf ( bfile, "\t   -----B Vector----- \n\n" );
-	for ( i=0; i<( names->currPos + vnumber + lnumber ); i++ )
-	{
-		fprintf ( bfile, "\t\t%f ", systemMna->vector_B[i] );
-		fprintf ( bfile, "\n");
-	}
 
-	fprintf( bfile, "\n\n\n\n" );
-	/*
-	printf ( "\t   -----X Vector----- \n\n" );
-	for ( i=0; i<( names->currPos + vnumber + lnumber ); i++ )
-	{
-		printf ( "\t\t%s ", systemMna->vector_X[i] );
-		printf("\n");
-	}
-	*/
-	fprintf ( bfile, "MNA Array ... \n " );
-	for ( i=0; i<( names->currPos + vnumber + lnumber ); i++ )
-	{
+  FILE *bfile;
 
-		fprintf(bfile, "\n");
+  bfile = fopen ( "mna_system.txt", "w" );
 
-		for( j=0; j<( names->currPos + vnumber + lnumber ); j++)
-		{
-			fprintf ( bfile, "%f\t", systemMna->array_A[i * (names->currPos + vnumber + lnumber) + j] );
-		}
-	}
 
-	fprintf(bfile, "\n\n\n\n");
-	fprintf ( bfile, "\t   -----Rows Vector----- \n\n" );
-		for ( i=0; i<( names->currPos + vnumber + lnumber ); i++ )
-		{
-			fprintf ( bfile, "\t\t%lf ", *systemMna->rowVector[i] );
-			fprintf(bfile, "\n");
-		}
+  fprintf( bfile, "\tINFO : Group 2 elements:\n\t\t-Voltage Sources: %d\n\t\t-Inductors: %d\n", vnumber, lnumber );
+  fprintf( bfile, "\tINFO : Group 1 elements:\n\t\t-Resistors: %d\n\t\t-Current Sources: %d\n", rnumber, inumber );
+  fprintf( bfile, "\tINFO : Number of nodes of sub-Matrix G: %d\n", names->currPos );
+  fprintf( bfile, "\n\n\n\n" );
+  fprintf ( bfile, "\t   -----B Vector----- \n\n" );
+  for ( i=0; i<( names->currPos + vnumber + lnumber ); i++ )
+  {
+    fprintf ( bfile, "\t\t%f ", systemMna->vector_B[i] );
+    fprintf ( bfile, "\n");
+  }
 
-	fclose ( bfile );
+  fprintf( bfile, "\n\n\n\n" );
+  /*
+     printf ( "\t   -----X Vector----- \n\n" );
+     for ( i=0; i<( names->currPos + vnumber + lnumber ); i++ )
+     {
+     fprintf (bfile, "\t\t%s ", systemMna->vector_X[i] );
+     fprintf(bfile, "\n");
+     }
+   */
+  fprintf ( bfile, "MNA Array ... \n " );
+  for ( i=0; i<( names->currPos + vnumber + lnumber ); i++ )
+  {
+
+    fprintf(bfile, "\n");
+
+    for( j=0; j<( names->currPos + vnumber + lnumber ); j++)
+    {
+      fprintf ( bfile, "%f\t", systemMna->array_A[i * (names->currPos + vnumber + lnumber) + j] );
+    }
+  }
+
+  fprintf(bfile, "\n\n\n\n");
+  if (cmdList->_transient)
+  {
+    fprintf ( bfile, "C Array ... \n " );
+    for ( i=0; i<( names->currPos + vnumber + lnumber ); i++ )
+    {
+      fprintf(bfile, "\n");
+      for( j=0; j<( names->currPos + vnumber + lnumber ); j++)
+      {
+        fprintf ( bfile, "%f\t", systemMna->array_C[i * (names->currPos + vnumber + lnumber) + j] );
+      }
+    }
+  }
+
+  fprintf(bfile, "\n\n\n\n");
+  fprintf ( bfile, "\t   -----Rows Vector----- \n\n" );
+  for ( i=0; i<( names->currPos + vnumber + lnumber ); i++ )
+  {
+    fprintf ( bfile, "\t\t%lf ", *systemMna->rowVector[i] );
+    fprintf(bfile, "\n");
+  }
+
+  fclose ( bfile );
 
 }

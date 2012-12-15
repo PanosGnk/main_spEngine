@@ -158,17 +158,56 @@ int main( int argc, char *argv[]) {
 
 		if ( cmdList->_useSparse )
 		{
-			dcSweepSimSparse ( _systemMnaSp, _trfiles, _nameTab );
+			dcSweepSimSparse ( _systemMnaSp, _trfiles, _nameTab, _mainCircuit );
 		}
 		else
 		{
-			dcSweepSim ( _systemMna, _trfiles, _nameTab );
+			dcSweepSim ( _systemMna, _trfiles, _nameTab, _mainCircuit );
 		}
 
 		printf ( "- DC Sweep Analysis Complete\n" );
 		fflush(stdout);
 	}
 
+
+
+        /*******************************
+         *          Transient       *
+         *******************************/
+
+        if (cmdList->_transient)
+        {
+                printf ( "- Starting Transient Analysis\n" );
+                fflush(stdout);
+
+                if (cmdList->_method == TR)
+                {
+                    if( cmdList->_useSparse )
+                    {
+                        cs_trapezoidal(_systemMnaSp, _mainCircuit, _nameTab);
+                    }
+                    else
+                    {
+
+                    }
+                }
+                else
+                {
+                    if( cmdList->_useSparse )
+                    {
+                        cs_backwardEuler(_systemMnaSp, _mainCircuit, _nameTab);
+                    }
+                    else
+                    {
+                        //backwardEuler( _systemMna, _mainCircuit, _nameTab);
+                    }
+                }
+
+                printf ( "- Transient Analysis Complete\n" );
+                fflush(stdout);
+
+
+        }
 
 	return EXIT_SUCCESS;
 }

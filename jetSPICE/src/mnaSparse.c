@@ -87,7 +87,7 @@ void addElementStampSparse( zeroCircuit *node, mnaSpSystem *system, cs *arrayA, 
 			break;
 		case 2: //case 2same as 5
 		case 5:
-
+			element->k = kPos;
 			if (element->element == 2)
 			{
 				system->vector_B[ namTab->currPos -1 + kPos ] += element->value;
@@ -144,7 +144,7 @@ void addElementStampSparse( zeroCircuit *node, mnaSpSystem *system, cs *arrayA, 
 
 }
 
-void buildC ( zeroCircuit *node, cs *arrayC, hashTable *namTab, int kPos )
+void buildCSp ( zeroCircuit *node, cs *arrayC, hashTable *namTab, int kPos )
 {
 	int posn1;
 	int posn2;
@@ -220,7 +220,6 @@ mnaSpSystem *formatMnaTableSparse ( zeroCircuit *circuit, hashTable *names, int 
 
     //initialize k position
     k_pos = 0;
-    cmdList->_transient = 1;
 
     finalSystem = ( mnaSpSystem * )malloc ( sizeof( mnaSpSystem ) );
 
@@ -258,7 +257,7 @@ mnaSpSystem *formatMnaTableSparse ( zeroCircuit *circuit, hashTable *names, int 
     	//Transient Analysis : Build C
     	if (cmdList->_transient == 1)
     	{
-    		buildC( cur, Cm, names, k_pos);
+    		buildCSp( cur, Cm, names, k_pos);
     	}
 
     }

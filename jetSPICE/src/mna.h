@@ -29,10 +29,15 @@ struct MNA_system
 {
 	double 	*array_A;
 	double 	*vector_B;
+	double  *array_C;
 	char 	**vector_X;
+
 
 	int 	dim;
 	double 	**rowVector;
+	double  **rowVectorC;
+	double *dcPointRes;
+	double *trRes;
 };
 
 typedef struct MNA_system mnaSystem;
@@ -43,9 +48,10 @@ nodeTable initializeTable ();
 //int findPlace(int connector,nodeTable *table );
 nodeTable  analyseNodes( zeroCircuit *node, nodeTable nodes );
 void printNodes( nodeTable nodes );
-void initVectorX ( zeroCircuit *node, mnaSystem *system, hashTable *table  );
+void initVectorX ( mnaSystem *system, hashTable *table  );
 void fillVectorX ( zeroCircuit *node, mnaSystem *system, int k, int origsize );
 void addElementStamp( zeroCircuit *node, mnaSystem *system, hashTable *namTab, int row, int kPos );
+void buildC ( zeroCircuit *node, mnaSystem *system, hashTable *namTab, int row, int kPos );
 void formatRowVec ( mnaSystem *finalSystem );
 mnaSystem *formatMnaTable ( zeroCircuit *circuit, hashTable *nameTab, int v_num, int l_num );
 void printMNA (hashTable *names, mnaSystem *systemMna);

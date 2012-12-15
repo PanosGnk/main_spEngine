@@ -283,12 +283,12 @@ double *cg (double **rowVector, double *bVector, int size, int *iter, double ito
       mvProd(q, rowVector, p, size, 0);
 
       omega = innerProd(p, q, size);
-      alpha=rho / omega;
+      alpha = rho / omega;
 
       vecSumScal(x,x,p,alpha,size);
       vecSumScal(r,r,q,-alpha,size);
 
-      rnorm2=innerProd(r,r,size);
+      rnorm2 = innerProd(r,r,size);
     }
 
   free(p);
@@ -345,7 +345,7 @@ double *bicg (double **rowVector, double *bVector, int size, int *iter, double i
 
       rho = innerProd(rr, z, size);
 
-      if (rho < EPS)
+      if (fabs(rho) < EPS)
         {
           printf("Bi-Conjugate Gradient Algorithm failed ... \n");
           exit(0);
@@ -363,13 +363,11 @@ double *bicg (double **rowVector, double *bVector, int size, int *iter, double i
           vecSumScal(pp,zz,pp,beta,size);
         }
 
-      rho1=rho;
-
       mvProd(q, rowVector, p, size, 0);
       mvProd(qq, rowVector, pp, size, 1);
 
       omega = innerProd(pp, q, size);
-      if (omega < EPS)
+      if (fabs(omega ) < EPS)
         {
           printf("Bi-Conjugate Gradient Algorithm failed ... \n");
           exit(0);
@@ -380,6 +378,8 @@ double *bicg (double **rowVector, double *bVector, int size, int *iter, double i
       vecSumScal(x,x,p,alpha,size);
       vecSumScal(r,r,q,-alpha,size);
       vecSumScal(rr,rr,qq,-alpha,size);
+
+      rho1=rho;
 
       rnorm2=innerProd(r,r,size);
     }
@@ -604,7 +604,7 @@ double *cs_cg (cs *A, double *bVector, int size, int *iter, double itol )
       state = cs_gaxpy(A,p,q);
       if (state == 0)
       {
-    	  printf("ERROR : in CG q[i] = A * p[i] multiplication using Sparse Matrices... \n");
+    	  printf("Error in CG q[i] = A * p[i] multiplication using Sparse Matrices... \n");
     	  exit(0);
       }
 
@@ -614,7 +614,7 @@ double *cs_cg (cs *A, double *bVector, int size, int *iter, double itol )
       vecSumScal(x,x,p,alpha,size);
       vecSumScal(r,r,q,-alpha,size);
 
-      rnorm2=innerProd(r,r,size);
+      rnorm2 = innerProd(r,r,size);
     }
 
   free(p);
@@ -692,8 +692,6 @@ double *cs_bicg (cs *A, double *bVector, int size, int *iter, double itol )
 	          vecSumScal(pp,zz,pp,beta,size);
 	        }
 
-	      rho1=rho;
-
 	      clearVec(q, size);
 	      state = cs_gaxpy(A,p,q);
 	      if (state == 0)
@@ -711,6 +709,11 @@ double *cs_bicg (cs *A, double *bVector, int size, int *iter, double itol )
 	      }
 
 	      omega = innerProd(pp, q, size);
+	      if (fabs(omega) < EPS)
+	      {
+	          printf("Bi-Conjugate Gradient Algorithm failed (Sparse)... \n");
+	          exit(0);
+	      }
 
 	      alpha = rho / omega;
 
@@ -718,7 +721,9 @@ double *cs_bicg (cs *A, double *bVector, int size, int *iter, double itol )
 	      vecSumScal(r,r,q,-alpha,size);
 	      vecSumScal(rr,rr,qq,-alpha,size);
 
-	      rnorm2=innerProd(r,r,size);
+	      rho1 = rho;
+
+	      rnorm2 = innerProd(r,r,size);
 	    }
 
 	  free(p);
@@ -1016,3 +1021,30 @@ void mvProd (double *Ax, double **A, double *x, int size, int method)
   }
 
 }
+
+void printVec(double *x, int size)
+{
+	int i;
+
+	printf("\n\n");
+	for (i = 0; i < size; i++)
+	{
+		printf("%f \n",x[i]);
+	}
+	printf("\n\n");
+
+}
+
+void addMMScal(double *M, double alpha, double *A, double beta, double *B, int size)
+{
+    int i, j;
+
+    for (i = 0; i < size; i++ )
+    {
+        for (j = 0; j < size; j++)
+        {
+            M[i * size + j] = alpha * A[i * size + j] + beta * B[i * size + j];
+        }
+    }
+}
+

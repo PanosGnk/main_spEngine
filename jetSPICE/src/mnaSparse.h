@@ -51,7 +51,7 @@ void addElementStampSparse( zeroCircuit *node, mnaSpSystem *system, cs *arrayA, 
  * @param nodes table with the nodes of the system.
  * @param kPos counter that extends the C matrix
  */
-void buildC ( zeroCircuit *node, cs *arrayC, hashTable *namTab, int kPos );
+void buildCSp ( zeroCircuit *node, cs *arrayC, hashTable *namTab, int kPos );
 
 /**
  * Function that builds the MNA matrices (G in DC, both G and C in transient analysis).
